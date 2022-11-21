@@ -11,7 +11,7 @@ import (
 func main() {
 
 	//url_alert := "http://52.45.17.177:802/XpertRestApi/api/alert_data"
-	url_location := "http://52.45.17.177:802/XpertRestApi/api/location_data"
+	url_location := "http://52.45.17.177:80/XpertRestApi/api/location_data"
 
 	var jsonData = []byte(`{
 		"deviceimei": 111112222233333,

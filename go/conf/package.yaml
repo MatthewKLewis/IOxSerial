@@ -27,11 +27,7 @@ app:
         interface-name: eth0
         ports:
             tcp:
-            - 8000
-            - 8001
-            udp:
-            - 8000
-            - 8001
+            - 80
 
 # Specify runtime and startup
   startup:
