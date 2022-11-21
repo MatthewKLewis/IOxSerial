@@ -1,35 +1,21 @@
-$ cat package.yaml
-descriptor-schema-version: "2.10"
-
+descriptor-schema-version: "2.2"
 info:
-  name: Go-based HTTP Poster App
-  description: "Go-based HTTP Poster App"
-  version: "1.0"
-  author-link: "http://www.airistaflow.com"
-  author-name: "AiRISTA"
-
+  name: dockerfile
+  version: latest
 app:
- # Refer Platform Support Matrix table.
- # armv7l for 32 bit CPU Architecture.
- # aarch64 for 64 bit CPU Architecture.
   cpuarch: armv7l
-  type: docker # Indicate app type (docker)
-
+  env:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
   resources:
-    profile: c1.small
-    devices:
-    - type: serial
-      label: HOST_DEV
-      alias: usb
-      usage: serial device of usb dongle connected to ap.
+    cpu: "50"
+    disk: "2"
+    memory: "64"
     network:
-      -   
-        interface-name: eth0
-        ports:
-            tcp:
-            - 80
-
-# Specify runtime and startup
+    - interface-name: eth0
+      ports: {}
+    profile: custom
   startup:
     rootfs: rootfs.img
-    target: /bin/sh
+    target:
+    - /bin/sh
+  type: docker
