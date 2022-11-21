@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 descriptor-schema-version: "2.2"
+=======
+descriptor-schema-version: "2.10"
+
+>>>>>>> d8d524514ed7f3eac5ec58cc12aa13f8a4c2d7d9
 info:
   name: dockerfile
   version: latest
