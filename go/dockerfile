@@ -4,5 +4,5 @@
 
 # USE below link for 32 bit Access Points
 FROM devhub-docker.cisco.com/iox-docker/ap3k/base-rootfs:latest
-COPY main.go /usr/bin/main.go
-RUN chmod 777 /usr/bin/main.go
+COPY main /usr/bin/main
+RUN chmod 777 /usr/bin/main
