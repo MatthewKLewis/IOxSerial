@@ -1,0 +1,8 @@
+# IOx app needs base-rootfs. Select either 32 or 64 bit version by uncommenting out one of the below link.
+# Use below link for 64 bit Access Points
+# FROM devhub-docker.cisco.com/iox-docker/ir1101/base-rootfs:latest
+
+# USE below link for 32 bit Access Points
+FROM devhub-docker.cisco.com/iox-docker/ap3k/base-rootfs:latest
+COPY main.go /usr/bin/main.go
+RUN chmod 777 /usr/bin/main.go
