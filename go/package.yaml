@@ -1,4 +1,3 @@
-$ cat package.yaml
 descriptor-schema-version: "2.10"
 
 info:
