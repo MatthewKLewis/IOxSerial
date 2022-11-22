@@ -12,32 +12,12 @@ import (
 )
 
 func main() {
-
-	//url_alert := "http://52.45.17.177:80/XpertRestApi/api/alert_data"
-	timeLastPostedLocation := time.Now()
-	locationPostingInterval := time.Second * 5
-
-	url_location := "http://52.45.17.177:80/XpertRestApi/api/location_data"
-	var jsonData = []byte(`{
-		"deviceimei": 111112222233333,
-		"altitude": 1,
-		"latitude": 38.443976,
-		"longitude": -78.874720,
-		"devicetime": 10,
-		"speed": 0,
-		"Batterylevel": "85",
-		"casefile_id": "string",
-		"address": "string",
-		"positioningmode": "string",
-		"tz": "string",
-		"alert_type": "string",
-		"alert_message": "string",
-		"alert_id": "string",
-		"offender_name": "string",
-		"offender_id": "string"
-	}`)
-
 	fmt.Println("Starting...")
+	printPorts()
+	//readSerialDataAndPost()
+}
+
+func printPorts() {
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		log.Fatal(err)
@@ -53,6 +33,31 @@ func main() {
 			fmt.Printf("   USB serial %s\n", port.SerialNumber)
 		}
 	}
+}
+
+func readSerialDataAndPost() {
+	timeLastPostedLocation := time.Now()
+	locationPostingInterval := time.Second * 5
+	//url_alert := "http://52.45.17.177:80/XpertRestApi/api/alert_data"
+	url_location := "http://52.45.17.177:80/XpertRestApi/api/location_data"
+	var jsonData = []byte(`{
+			"deviceimei": 111112222233333,
+			"altitude": 1,
+			"latitude": 38.443976,
+			"longitude": -78.874720,
+			"devicetime": 10,
+			"speed": 0,
+			"Batterylevel": "85",
+			"casefile_id": "string",
+			"address": "string",
+			"positioningmode": "string",
+			"tz": "string",
+			"alert_type": "string",
+			"alert_message": "string",
+			"alert_id": "string",
+			"offender_name": "string",
+			"offender_id": "string"
+	}`)
 
 	mode := &serial.Mode{
 		BaudRate: 230400,
@@ -63,6 +68,7 @@ func main() {
 	}
 
 	buff := make([]byte, 100)
+
 	for {
 		n, err := port.Read(buff)
 		if err != nil {
