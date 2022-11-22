@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 
 	"go.bug.st/serial"
@@ -14,7 +16,7 @@ import (
 func main() {
 	fmt.Println("Starting...")
 	printPorts()
-	//readSerialDataAndPost()
+	readSerialDataAndPost()
 }
 
 func printPorts() {
@@ -38,13 +40,16 @@ func printPorts() {
 func readSerialDataAndPost() {
 	timeLastPostedLocation := time.Now()
 	locationPostingInterval := time.Second * 5
+	var lat float64 = 38.443976 + (rand.Float64() / 100)
+	var lon float64 = -78.874720 + (rand.Float64() / 100)
+
 	//url_alert := "http://52.45.17.177:80/XpertRestApi/api/alert_data"
 	url_location := "http://52.45.17.177:80/XpertRestApi/api/location_data"
 	var jsonData = []byte(`{
 			"deviceimei": 111112222233333,
 			"altitude": 1,
-			"latitude": 38.443976,
-			"longitude": -78.874720,
+			"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
+			"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
 			"devicetime": 10,
 			"speed": 0,
 			"Batterylevel": "85",
@@ -53,7 +58,7 @@ func readSerialDataAndPost() {
 			"positioningmode": "string",
 			"tz": "string",
 			"alert_type": "string",
-			"alert_message": "string",
+			"alert_message": "` + "Hello" + `",
 			"alert_id": "string",
 			"offender_name": "string",
 			"offender_id": "string"
