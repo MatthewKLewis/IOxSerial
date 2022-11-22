@@ -6,13 +6,26 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"go.bug.st/serial"
 )
 
 func main() {
+	fmt.Println("Starting...")
+
+	ports, err := serial.GetPortsList()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(ports) == 0 {
+		log.Fatal("No serial ports found!")
+	}
+	for _, port := range ports {
+		fmt.Printf("Found port: %v\n", port)
+	}
 
 	//url_alert := "http://52.45.17.177:80/XpertRestApi/api/alert_data"
 	url_location := "http://52.45.17.177:80/XpertRestApi/api/location_data"
-
 	var jsonData = []byte(`{
 		"deviceimei": 111112222233333,
 		"altitude": 1,
@@ -34,7 +47,6 @@ func main() {
 
 	for true {
 		time.Sleep(time.Second * 3)
-
 		resp, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
 		if err != nil {
 			log.Fatal(err)
