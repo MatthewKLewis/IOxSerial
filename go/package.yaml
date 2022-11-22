@@ -17,8 +17,7 @@ app:
   resources:
     profile: c1.small
     network:
-      -   
-        interface-name: eth0
+      - interface-name: eth0
         ports:
             tcp:
             - 80
