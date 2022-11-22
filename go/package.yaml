@@ -16,11 +16,6 @@ app:
 
   resources:
     profile: c1.small
-    devices:
-    - type: serial
-      label: HOST_DEV
-      alias: usb
-      usage: serial device of usb dongle connected to ap.
     network:
       -   
         interface-name: eth0
@@ -31,4 +26,4 @@ app:
 # Specify runtime and startup
   startup:
     rootfs: rootfs.img
-    target: /bin/sh
+    target: /usr/bin/main 1>/dev/null 2>/dev/null
