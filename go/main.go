@@ -63,7 +63,6 @@ func main() {
 	}
 
 	buff := make([]byte, 100)
-
 	for {
 		n, err := port.Read(buff)
 		if err != nil {
