@@ -22,7 +22,8 @@ app:
     #   alias: usb
     #   usage: serial device of usb dongle connected to ap.
     network:
-      - interface-name: eth0
+      - 
+        interface-name: eth0
         ports:
             tcp:
             - 80
