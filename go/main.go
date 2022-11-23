@@ -9,17 +9,16 @@ import (
 	"strconv"
 	"time"
 
-	"go.bug.st/serial"
 	"go.bug.st/serial/enumerator"
 )
 
 func main() {
 	fmt.Println("Starting...")
-	printPorts()
 	readSerialDataAndPost()
 }
 
-func printPorts() {
+func readSerialDataAndPost() {
+	var portString string = ""
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		log.Fatal(err)
@@ -34,10 +33,9 @@ func printPorts() {
 			fmt.Printf("   USB ID     %s:%s\n", port.VID, port.PID)
 			fmt.Printf("   USB serial %s\n", port.SerialNumber)
 		}
+		portString += port.Name + ", "
 	}
-}
 
-func readSerialDataAndPost() {
 	timeLastPostedLocation := time.Now()
 	locationPostingInterval := time.Second * 5
 	var lat float64 = 38.443976 + (rand.Float64() / 100)
@@ -58,33 +56,33 @@ func readSerialDataAndPost() {
 			"positioningmode": "string",
 			"tz": "string",
 			"alert_type": "string",
-			"alert_message": "` + "Hello" + `",
+			"alert_message": "` + portString + `",
 			"alert_id": "string",
 			"offender_name": "string",
 			"offender_id": "string"
 	}`)
 
-	mode := &serial.Mode{
-		BaudRate: 230400,
-	}
-	port, err := serial.Open("COM5", mode)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// mode := &serial.Mode{
+	// 	BaudRate: 230400,
+	// }
+	// port, err := serial.Open("COM9", mode)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	buff := make([]byte, 100)
+	// buff := make([]byte, 100)
 
 	for {
-		n, err := port.Read(buff)
-		if err != nil {
-			log.Fatal(err)
-			break
-		}
-		if n == 0 {
-			fmt.Println("\nEOF")
-			break
-		}
-		fmt.Printf("%v", string(buff[:n]))
+		// n, err := port.Read(buff)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// 	break
+		// }
+		// if n == 0 {
+		// 	fmt.Println("\nEOF")
+		// 	break
+		// }
+		// fmt.Printf("%v", string(buff[:n]))
 
 		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
 			timeLastPostedLocation = time.Now()
