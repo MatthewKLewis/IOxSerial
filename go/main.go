@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -13,7 +12,6 @@ import (
 )
 
 func main() {
-	fmt.Println("Starting...")
 	readSerialDataAndPost()
 }
 
@@ -24,15 +22,14 @@ func readSerialDataAndPost() {
 		log.Fatal(err)
 	}
 	if len(ports) == 0 {
-		fmt.Println("No serial ports found!")
-		return
+		portString = "No serial ports found!"
 	}
 	for _, port := range ports {
-		fmt.Printf("Found port: %s\n", port.Name)
-		if port.IsUSB {
-			fmt.Printf("   USB ID     %s:%s\n", port.VID, port.PID)
-			fmt.Printf("   USB serial %s\n", port.SerialNumber)
-		}
+		// fmt.Printf("Found port: %s\n", port.Name)
+		// if port.IsUSB {
+		// 	fmt.Printf("   USB ID     %s:%s\n", port.VID, port.PID)
+		// 	fmt.Printf("   USB serial %s\n", port.SerialNumber)
+		// }
 		portString += port.Name + ", "
 	}
 
@@ -86,11 +83,10 @@ func readSerialDataAndPost() {
 
 		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
 			timeLastPostedLocation = time.Now()
-			resp, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
+			_, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Println(resp.Status)
 		}
 	}
 }
