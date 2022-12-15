@@ -24,8 +24,9 @@ app:
     profile: c1.small
     devices:
     - type: serial
-      alias: usb_serial
+      alias: usb
       label: ttyH0
+      device-id: ttyH0
       usage: This is the serial device of USB port
     network:
       -   

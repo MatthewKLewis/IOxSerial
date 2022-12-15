@@ -3,7 +3,8 @@
     "devices": [
       {
         "type": "serial",
-        "alias": "usb_serial",
+        "alias": "usb",
+        "device-id": "ttyH0",
         "label": "ttyH0",
         "usage": "This is the serial device of USB port"
       }
