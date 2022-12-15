@@ -17,10 +17,13 @@ app:
   resources:
     profile: c1.small
     devices:
-    - type: serial
-      label: HOST_DEV
-      alias: usb
-      usage: serial device of usb dongle connected to ap.
+      -  
+        type: serial
+        label: HOST_DEV
+        usage: IOT functionality through serial device
+        alias: usb
+        function: serial
+        mandatory: yes
     network:
       - 
         interface-name: eth0
