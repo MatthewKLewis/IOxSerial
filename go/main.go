@@ -99,6 +99,8 @@ func readSerialDataAndPost() {
 			"offender_id": "string"
 		}`)
 
+		// AoA decode
+
 		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
 			printStringInDebugMode("Sending Packet to API")
 			timeLastPostedLocation = time.Now()
