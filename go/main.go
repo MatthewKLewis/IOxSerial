@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"go.bug.st/serial"
 	"go.bug.st/serial/enumerator"
 )
 
@@ -40,12 +41,51 @@ func readSerialDataAndPost() {
 	var lat float64 = 38.443976 + (rand.Float64() / 100)
 	var lon float64 = -78.874720 + (rand.Float64() / 100)
 
-	var portName = "ERROR"
-	if len(portArray) > 0 {
-		portName = portArray[0]
-	}
+	// var portName = "ERROR"
+	// if len(portArray) > 0 {
+	// 	portName = portArray[0]
+	// }
 
-	var jsonData = []byte(`{
+	// var jsonData = []byte(`{
+	// 		"deviceimei": 111112222233333,
+	// 		"altitude": 1,
+	// 		"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
+	// 		"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
+	// 		"devicetime": 10,
+	// 		"speed": 0,
+	// 		"Batterylevel": "85",
+	// 		"casefile_id": "string",
+	// 		"address": "string",
+	// 		"positioningmode": "string",
+	// 		"tz": "string",
+	// 		"alert_type": "string",
+	// 		"alert_message": "` + portName + `",
+	// 		"alert_id": "string",
+	// 		"offender_name": "string",
+	// 		"offender_id": "string"
+	// }`)
+
+	mode := &serial.Mode{
+		BaudRate: 230400,
+	}
+	port, err := serial.Open(portArray[0], mode)
+	if err != nil {
+		log.Fatal(err)
+	}
+	buff := make([]byte, 1024) //100 ?
+
+	for {
+		n, err := port.Read(buff)
+		if err != nil {
+			log.Fatal(err)
+			break
+		}
+		if n == 0 {
+			fmt.Println("\nEOF")
+			break
+		}
+
+		var jsonData = []byte(`{
 			"deviceimei": 111112222233333,
 			"altitude": 1,
 			"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
@@ -58,32 +98,11 @@ func readSerialDataAndPost() {
 			"positioningmode": "string",
 			"tz": "string",
 			"alert_type": "string",
-			"alert_message": "` + portName + `",
+			"alert_message": "` + string(buff[:n]) + `",
 			"alert_id": "string",
 			"offender_name": "string",
 			"offender_id": "string"
-	}`)
-
-	// mode := &serial.Mode{
-	// 	BaudRate: 230400,
-	// }
-	// port, err := serial.Open(portArray[0], mode)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// buff := make([]byte, 1024) //100 ?
-
-	for {
-		// n, err := port.Read(buff)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// 	break
-		// }
-		// if n == 0 {
-		// 	fmt.Println("\nEOF")
-		// 	break
-		// }
-		// printStringInDebugMode(string(buff[:n]))
+		}`)
 
 		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
 			printStringInDebugMode("Sending Packet to API")
