@@ -1,12 +1,20 @@
 {
   "resources": {
+    "network": [
+      {
+        "interface-name": "eth0",
+        "network-name": "iox-nat0",
+        "port_map": { "mode": "1to1" }
+      }
+    ],
     "devices": [
       {
         "type": "serial",
         "alias": "usb",
-        "label": "ttyH0",
-        "device-id": "/dev/ttyH0",
-        "usage": "This is the serial device of USB port"
+        "label": "HOST_DEV",
+        "device-name": "async1",
+        "device-id": "/dev/ttyUSB0",
+        "usage": "Serial device of USB port of AP"
       }
     ]
   }
