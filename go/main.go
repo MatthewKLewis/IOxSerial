@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
-	"go.bug.st/serial/enumerator"
 )
 
 // CONFIG LATER
@@ -25,14 +23,14 @@ func main() {
 
 func readSerialDataAndPost() {
 	var portArray []string
-	ports, err := enumerator.GetDetailedPortsList()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, port := range ports {
-		portArray = append(portArray, port.Name)
-	}
-	printArrayInDebugMode(portArray)
+	// ports, err := enumerator.GetDetailedPortsList()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// for _, port := range ports {
+	// 	portArray = append(portArray, port.Name)
+	// }
+	// printArrayInDebugMode(portArray)
 
 	timeLastPostedLocation := time.Now()
 	locationPostingInterval := time.Second * 5
