@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"go.bug.st/serial/enumerator"
 )
 
 // CONFIG LATER
@@ -23,19 +25,24 @@ func main() {
 
 func readSerialDataAndPost() {
 	var portArray []string
-	// ports, err := enumerator.GetDetailedPortsList()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// for _, port := range ports {
-	// 	portArray = append(portArray, port.Name)
-	// }
-	// printArrayInDebugMode(portArray)
+	ports, err := enumerator.GetDetailedPortsList()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, port := range ports {
+		portArray = append(portArray, port.Name)
+	}
+	printArrayInDebugMode(portArray)
 
 	timeLastPostedLocation := time.Now()
 	locationPostingInterval := time.Second * 5
 	var lat float64 = 38.443976 + (rand.Float64() / 100)
 	var lon float64 = -78.874720 + (rand.Float64() / 100)
+
+	var portName = "ERROR"
+	if len(portArray) > 0 {
+		portName = portArray[0]
+	}
 
 	var jsonData = []byte(`{
 			"deviceimei": 111112222233333,
@@ -50,7 +57,7 @@ func readSerialDataAndPost() {
 			"positioningmode": "string",
 			"tz": "string",
 			"alert_type": "string",
-			"alert_message": "` + portArray[0] + `",
+			"alert_message": "` + portName + `",
 			"alert_id": "string",
 			"offender_name": "string",
 			"offender_id": "string"
