@@ -4,8 +4,8 @@
       {
         "type": "serial",
         "alias": "usb",
-        "device-id": "ttyH0",
         "label": "ttyH0",
+        "device-id": "/dev/ttyH0",
         "usage": "This is the serial device of USB port"
       }
     ]

@@ -26,7 +26,7 @@ app:
     - type: serial
       alias: usb
       label: ttyH0
-      device-id: ttyH0
+      device-id: /dev/ttyH0
       usage: This is the serial device of USB port
     network:
       -   
