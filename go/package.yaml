@@ -18,7 +18,7 @@ app:
     profile: c1.small
     devices:
       -  
-        type: usb_serial
+        type: serial
         label: HOST_DEV
         usage: IOT functionality through serial device
         alias: usb
