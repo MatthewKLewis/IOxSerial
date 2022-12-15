@@ -1,1 +1,0 @@
-echo "Starting..." && ioxclient application deactivate portposter
