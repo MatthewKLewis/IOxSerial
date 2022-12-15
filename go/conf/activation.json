@@ -5,7 +5,7 @@
         "type": "serial",
         "alias": "usb_serial",
         "label": "ttyH0",
-        "usage": " This is the serial device of USB port"
+        "usage": "This is the serial device of USB port"
       }
     ]
   }
