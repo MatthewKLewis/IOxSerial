@@ -19,7 +19,7 @@ app:
     devices:
       -  
         type: serial
-        label: ttyH0
+        label: HOST_DEV
         usage: IOT functionality through serial device
         alias: usb
         function: serial
