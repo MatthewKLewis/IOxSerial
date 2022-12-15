@@ -16,14 +16,14 @@ app:
 
   resources:
     profile: c1.small
-    devices:
-      -  
-        type: serial
-        label: HOST_DEV
-        usage: IOT functionality through serial device
-        alias: usb
-        function: serial
-        mandatory: yes
+    # devices:
+    #   -  
+    #     type: serial
+    #     label: HOST_DEV
+    #     usage: IOT functionality through serial device
+    #     alias: usb
+    #     function: serial
+    #     mandatory: yes
     network:
       - 
         interface-name: eth0

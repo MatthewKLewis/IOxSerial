@@ -28,6 +28,7 @@ func readSerialDataAndPost() {
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		log.Fatal(err)
+		panic(err)
 	}
 	for _, port := range ports {
 		portArray = append(portArray, port.Name)
