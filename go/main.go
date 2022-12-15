@@ -25,16 +25,11 @@ func main() {
 }
 
 func readSerialDataAndPost() {
-	var portArray []string
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		log.Fatal(err)
 		panic(err)
 	}
-	for _, port := range ports {
-		portArray = append(portArray, port.Name)
-	}
-	printArrayInDebugMode(portArray)
 
 	timeLastPostedLocation := time.Now()
 	locationPostingInterval := time.Second * 5
@@ -66,16 +61,16 @@ func readSerialDataAndPost() {
 	// }`)
 
 	mode := &serial.Mode{
-		BaudRate: 230400,
+		BaudRate: 115200, //115200 //230400
 	}
-	port, err := serial.Open(portArray[0], mode)
+	openPort, err := serial.Open(ports[0].Name, mode)
 	if err != nil {
 		log.Fatal(err)
 	}
 	buff := make([]byte, 1024) //100 ?
 
 	for {
-		n, err := port.Read(buff)
+		n, err := openPort.Read(buff)
 		if err != nil {
 			log.Fatal(err)
 			break
