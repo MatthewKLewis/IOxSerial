@@ -2,27 +2,30 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
 
+	"go.bug.st/serial"
 	"go.bug.st/serial/enumerator"
 )
 
+var debugMode = true
+
 func main() {
+	printStringInDebugMode("Starting Server...")
 	readSerialDataAndPost()
 }
 
 func readSerialDataAndPost() {
-	var portString string = ""
+	var portArray []string
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		log.Fatal(err)
-	}
-	if len(ports) == 0 {
-		portString = "No serial ports found!"
 	}
 	for _, port := range ports {
 		// fmt.Printf("Found port: %s\n", port.Name)
@@ -30,8 +33,10 @@ func readSerialDataAndPost() {
 		// 	fmt.Printf("   USB ID     %s:%s\n", port.VID, port.PID)
 		// 	fmt.Printf("   USB serial %s\n", port.SerialNumber)
 		// }
-		portString += port.Name + ", "
+		portArray = append(portArray, port.Name)
 	}
+
+	printArrayInDebugMode(portArray)
 
 	timeLastPostedLocation := time.Now()
 	locationPostingInterval := time.Second * 5
@@ -53,40 +58,59 @@ func readSerialDataAndPost() {
 			"positioningmode": "string",
 			"tz": "string",
 			"alert_type": "string",
-			"alert_message": "` + portString + `",
+			"alert_message": "` + portArray[0] + `",
 			"alert_id": "string",
 			"offender_name": "string",
 			"offender_id": "string"
 	}`)
 
-	// mode := &serial.Mode{
-	// 	BaudRate: 230400,
-	// }
-	// port, err := serial.Open("COM9", mode)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// buff := make([]byte, 100)
+	mode := &serial.Mode{
+		BaudRate: 230400,
+	}
+	port, err := serial.Open(portArray[0], mode)
+	if err != nil {
+		log.Fatal(err)
+	}
+	buff := make([]byte, 1024) //100 ?
 
 	for {
-		// n, err := port.Read(buff)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// 	break
-		// }
-		// if n == 0 {
-		// 	fmt.Println("\nEOF")
-		// 	break
-		// }
-		// fmt.Printf("%v", string(buff[:n]))
+		n, err := port.Read(buff)
+		if err != nil {
+			log.Fatal(err)
+			break
+		}
+		if n == 0 {
+			fmt.Println("\nEOF")
+			break
+		}
+		printStringInDebugMode(string(buff[:n]))
 
 		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
+			printStringInDebugMode("Sending Packet to API")
 			timeLastPostedLocation = time.Now()
-			_, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
+			resp, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
+			bodyBytes, err := io.ReadAll(resp.Body)
 			if err != nil {
 				log.Fatal(err)
 			}
+
+			if resp.StatusCode == http.StatusOK {
+				printStringInDebugMode(string(bodyBytes))
+			} else {
+				printStringInDebugMode(string(bodyBytes))
+			}
 		}
+	}
+}
+
+func printStringInDebugMode(str string) {
+	if debugMode == true {
+		fmt.Println(str)
+	}
+}
+
+func printArrayInDebugMode(str []string) {
+	if debugMode == true {
+		fmt.Println(str)
 	}
 }
