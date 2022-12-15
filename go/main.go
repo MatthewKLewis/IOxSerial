@@ -70,15 +70,6 @@ func readSerialDataAndPost() {
 	buff := make([]byte, 1024) //100 ?
 
 	for {
-		n, err := openPort.Read(buff)
-		if err != nil {
-			log.Fatal(err)
-			break
-		}
-		if n == 0 {
-			fmt.Println("\nEOF")
-			break
-		}
 
 		var jsonData = []byte(`{
 			"deviceimei": 111112222233333,
@@ -93,11 +84,87 @@ func readSerialDataAndPost() {
 			"positioningmode": "string",
 			"tz": "string",
 			"alert_type": "string",
-			"alert_message": "` + string(buff[:n]) + `",
+			"alert_message": "` + "FIRST ASSIGN" + `",
 			"alert_id": "string",
 			"offender_name": "string",
 			"offender_id": "string"
 		}`)
+
+		n, err := openPort.Read(buff)
+		if err != nil {
+			log.Fatal(err)
+			var jsonData = []byte(`{
+				"deviceimei": 111112222233333,
+				"altitude": 1,
+				"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
+				"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
+				"devicetime": 10,
+				"speed": 0,
+				"Batterylevel": "85",
+				"casefile_id": "string",
+				"address": "string",
+				"positioningmode": "string",
+				"tz": "string",
+				"alert_type": "string",
+				"alert_message": "` + "ERROR coudlnt read" + `",
+				"alert_id": "string",
+				"offender_name": "string",
+				"offender_id": "string"
+			}`)
+			if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
+				printStringInDebugMode("Sending Packet to API")
+				timeLastPostedLocation = time.Now()
+				resp, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
+				bodyBytes, err := io.ReadAll(resp.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				if resp.StatusCode == http.StatusOK {
+					printStringInDebugMode(string(bodyBytes))
+				} else {
+					printStringInDebugMode(string(bodyBytes))
+				}
+			}
+			break
+		}
+		if n == 0 {
+			log.Fatal(err)
+			var jsonData = []byte(`{
+				"deviceimei": 111112222233333,
+				"altitude": 1,
+				"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
+				"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
+				"devicetime": 10,
+				"speed": 0,
+				"Batterylevel": "85",
+				"casefile_id": "string",
+				"address": "string",
+				"positioningmode": "string",
+				"tz": "string",
+				"alert_type": "string",
+				"alert_message": "` + "ERROR no data to read" + `",
+				"alert_id": "string",
+				"offender_name": "string",
+				"offender_id": "string"
+			}`)
+			if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
+				printStringInDebugMode("Sending Packet to API")
+				timeLastPostedLocation = time.Now()
+				resp, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
+				bodyBytes, err := io.ReadAll(resp.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				if resp.StatusCode == http.StatusOK {
+					printStringInDebugMode(string(bodyBytes))
+				} else {
+					printStringInDebugMode(string(bodyBytes))
+				}
+			}
+			break
+		}
 
 		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
 			printStringInDebugMode("Sending Packet to API")
