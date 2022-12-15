@@ -1,1 +1,1 @@
-echo "Adding New..." && ioxclient docker package ioxposter ./conf && cd conf && ioxclient application run portposter package.tar --payload activation.json && cd .. && echo "Listing Active..." && ioxclient application list
+echo "Building and Adding anew..." && docker rmi -f $(docker images -aq) && docker build -t ioxposter . && ioxclient docker package ioxposter ./conf && cd conf && ioxclient application run portposter package.tar --payload activation.json && cd .. && echo "Listing Active..." && ioxclient application list
