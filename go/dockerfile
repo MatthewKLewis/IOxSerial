@@ -5,5 +5,5 @@
 # USE below link for 32 bit Access Points
 FROM devhub-docker.cisco.com/iox-docker/ap3k/base-rootfs:latest
 COPY main /usr/bin/main
-RUN export HOST_DEV=/dev/ttyH0
+RUN export HOST_DEV=/dev/ttyUSB0
 RUN chmod 777 /usr/bin/main
