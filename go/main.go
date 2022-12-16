@@ -45,14 +45,14 @@ func readSerialDataAndPost() {
 	buff := make([]byte, 1024) //100 ?
 
 	for {
+		var messageToAPI = "ERROR"
 		n, err := openPort.Read(buff)
 		if err != nil {
-			log.Fatal(err)
-			break
-		}
-		if n == 0 {
-			fmt.Println("\nEOF")
-			break
+			messageToAPI = "ERROR READING"
+		} else if n == 0 {
+			messageToAPI = "ERROR 0 BYTES READ"
+		} else {
+			messageToAPI = string(buff[:n])
 		}
 
 		// AoA decode
@@ -71,7 +71,7 @@ func readSerialDataAndPost() {
 				"positioningmode": "string",
 				"tz": "string",
 				"alert_type": "string",
-				"alert_message": "` + string(buff[:n]) + `",
+				"alert_message": "` + messageToAPI + `",
 				"alert_id": "string",
 				"offender_name": "string",
 				"offender_id": "string"
