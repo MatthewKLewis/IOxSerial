@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"go.bug.st/serial/enumerator"
 )
 
 // CONFIG LATER
@@ -21,15 +23,15 @@ func main() {
 }
 
 func readSerialDataAndPost() {
-	// ports, err := enumerator.GetDetailedPortsList()
-	// if err != nil {
-	// 	//log.Fatal(err)
-	// }
+	ports, err := enumerator.GetDetailedPortsList()
+	if err != nil {
+		//log.Fatal(err)
+	}
 
 	timeLastPostedLocation := time.Now()
 	locationPostingInterval := time.Second * 5
-	var lat float64 = 38.443976 + (rand.Float64() / 100)
-	var lon float64 = -78.874720 + (rand.Float64() / 100)
+	var lat float64 = 38.443996 + (rand.Float64() / 100)
+	var lon float64 = -78.874740 + (rand.Float64() / 100)
 
 	// mode := &serial.Mode{
 	// 	BaudRate: 115200, //115200 tag //230400 antenna
@@ -42,6 +44,10 @@ func readSerialDataAndPost() {
 
 	for {
 		var messageToAPI = "ERROR"
+		if len(ports) > 0 {
+			messageToAPI = ports[0].Name
+		}
+
 		//n, err := openPort.Read(buff)
 		// if err != nil {
 		// 	messageToAPI = "ERROR READING"
