@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"log"
 	"math/rand"
 	"net/http"
@@ -36,32 +35,8 @@ func readSerialDataAndPost() {
 	var lat float64 = 38.443976 + (rand.Float64() / 100)
 	var lon float64 = -78.874720 + (rand.Float64() / 100)
 
-	// var portName = "ERROR"
-	// if len(portArray) > 0 {
-	// 	portName = portArray[0]
-	// }
-
-	// var jsonData = []byte(`{
-	// 		"deviceimei": 111112222233333,
-	// 		"altitude": 1,
-	// 		"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
-	// 		"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
-	// 		"devicetime": 10,
-	// 		"speed": 0,
-	// 		"Batterylevel": "85",
-	// 		"casefile_id": "string",
-	// 		"address": "string",
-	// 		"positioningmode": "string",
-	// 		"tz": "string",
-	// 		"alert_type": "string",
-	// 		"alert_message": "` + portName + `",
-	// 		"alert_id": "string",
-	// 		"offender_name": "string",
-	// 		"offender_id": "string"
-	// }`)
-
 	mode := &serial.Mode{
-		BaudRate: 115200, //115200 //230400
+		BaudRate: 115200, //115200 tag //230400 antenna
 	}
 	openPort, err := serial.Open(ports[0].Name, mode)
 	if err != nil {
@@ -80,40 +55,34 @@ func readSerialDataAndPost() {
 			break
 		}
 
-		var jsonData = []byte(`{
-			"deviceimei": 111112222233333,
-			"altitude": 1,
-			"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
-			"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
-			"devicetime": 10,
-			"speed": 0,
-			"Batterylevel": "85",
-			"casefile_id": "string",
-			"address": "string",
-			"positioningmode": "string",
-			"tz": "string",
-			"alert_type": "string",
-			"alert_message": "` + string(buff[:n]) + `",
-			"alert_id": "string",
-			"offender_name": "string",
-			"offender_id": "string"
-		}`)
-
 		// AoA decode
-
 		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
+
+			var jsonData = []byte(`{
+				"deviceimei": 111112222233333,
+				"altitude": 1,
+				"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
+				"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
+				"devicetime": 10,
+				"speed": 0,
+				"Batterylevel": "85",
+				"casefile_id": "string",
+				"address": "string",
+				"positioningmode": "string",
+				"tz": "string",
+				"alert_type": "string",
+				"alert_message": "` + string(buff[:n]) + `",
+				"alert_id": "string",
+				"offender_name": "string",
+				"offender_id": "string"
+			}`)
+
 			printStringInDebugMode("Sending Packet to API")
 			timeLastPostedLocation = time.Now()
-			resp, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
-			bodyBytes, err := io.ReadAll(resp.Body)
+			_, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
+			//_, err := io.ReadAll(resp.Body)
 			if err != nil {
 				log.Fatal(err)
-			}
-
-			if resp.StatusCode == http.StatusOK {
-				printStringInDebugMode(string(bodyBytes))
-			} else {
-				printStringInDebugMode(string(bodyBytes))
 			}
 		}
 	}
