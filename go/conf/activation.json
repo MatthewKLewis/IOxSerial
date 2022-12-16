@@ -5,7 +5,6 @@
         "type": "serial",
         "alias": "usb",
         "label": "HOST_DEV",
-        "device-name": "async1",
         "device-id": "/dev/ttyUSB0",
         "usage": "Serial device of USB port of AP"
       }
