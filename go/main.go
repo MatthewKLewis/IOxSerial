@@ -26,8 +26,7 @@ func main() {
 func readSerialDataAndPost() {
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
-		log.Fatal(err)
-		panic(err)
+		//log.Fatal(err)
 	}
 
 	timeLastPostedLocation := time.Now()
@@ -40,7 +39,7 @@ func readSerialDataAndPost() {
 	}
 	openPort, err := serial.Open(ports[0].Name, mode)
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
 	}
 	buff := make([]byte, 1024) //100 ?
 
