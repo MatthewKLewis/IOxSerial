@@ -8,6 +8,9 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"go.bug.st/serial"
+	"go.bug.st/serial/enumerator"
 )
 
 // CONFIG LATER
@@ -21,58 +24,39 @@ func main() {
 }
 
 func readSerialDataAndPost() {
-	// ports, err := enumerator.GetDetailedPortsList()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// 	panic(err)
-	// }
+	ports, err := enumerator.GetDetailedPortsList()
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
 
 	timeLastPostedLocation := time.Now()
 	locationPostingInterval := time.Second * 5
 	var lat float64 = 38.443976 + (rand.Float64() / 100)
 	var lon float64 = -78.874720 + (rand.Float64() / 100)
 
-	// mode := &serial.Mode{
-	// 	BaudRate: 115200, //115200 tag //230400 antenna
-	// }
-	// openPort, err := serial.Open(ports[0].Name, mode)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// buff := make([]byte, 1024) //100 ?
+	mode := &serial.Mode{
+		BaudRate: 115200, //115200 tag //230400 antenna
+	}
+	openPort, err := serial.Open(ports[0].Name, mode)
+	if err != nil {
+		log.Fatal(err)
+	}
+	buff := make([]byte, 1024) //100 ?
 
 	for {
-		// n, err := openPort.Read(buff)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// 	break
-		// }
-		// if n == 0 {
-		// 	fmt.Println("\nEOF")
-		// 	break
-		// }
+		n, err := openPort.Read(buff)
+		if err != nil {
+			log.Fatal(err)
+			break
+		}
+		if n == 0 {
+			fmt.Println("\nEOF")
+			break
+		}
 
 		// AoA decode
 		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
-
-			// var jsonData = []byte(`{
-			// 	"deviceimei": 111112222233333,
-			// 	"altitude": 1,
-			// 	"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
-			// 	"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
-			// 	"devicetime": 10,
-			// 	"speed": 0,
-			// 	"Batterylevel": "85",
-			// 	"casefile_id": "string",
-			// 	"address": "string",
-			// 	"positioningmode": "string",
-			// 	"tz": "string",
-			// 	"alert_type": "string",
-			// 	"alert_message": "` + string(buff[:n]) + `",
-			// 	"alert_id": "string",
-			// 	"offender_name": "string",
-			// 	"offender_id": "string"
-			// }`)
 
 			var jsonData = []byte(`{
 				"deviceimei": 111112222233333,
@@ -87,7 +71,7 @@ func readSerialDataAndPost() {
 				"positioningmode": "string",
 				"tz": "string",
 				"alert_type": "string",
-				"alert_message": "` + "KEEP OPEN!" + `",
+				"alert_message": "` + string(buff[:n]) + `",
 				"alert_id": "string",
 				"offender_name": "string",
 				"offender_id": "string"
