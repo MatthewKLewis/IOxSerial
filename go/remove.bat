@@ -1,0 +1,1 @@
+echo "Starting..." && ioxclient application stop portposter && ioxclient application deactivate portposter && ioxclient application deactivate portposter && ioxclient application uninstall portposter && echo ... && echo Listing Remaining... && ioxclient application list

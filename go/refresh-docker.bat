@@ -1,0 +1,1 @@
+echo "Removing Docker image, Building Docker image..." && docker rmi -f $(docker images -q) && docker build -t ioxposter . 
