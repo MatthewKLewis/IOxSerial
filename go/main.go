@@ -8,9 +8,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
-	"go.bug.st/serial"
-	"go.bug.st/serial/enumerator"
 )
 
 // CONFIG LATER
@@ -24,35 +21,35 @@ func main() {
 }
 
 func readSerialDataAndPost() {
-	ports, err := enumerator.GetDetailedPortsList()
-	if err != nil {
-		//log.Fatal(err)
-	}
+	// ports, err := enumerator.GetDetailedPortsList()
+	// if err != nil {
+	// 	//log.Fatal(err)
+	// }
 
 	timeLastPostedLocation := time.Now()
 	locationPostingInterval := time.Second * 5
 	var lat float64 = 38.443976 + (rand.Float64() / 100)
 	var lon float64 = -78.874720 + (rand.Float64() / 100)
 
-	mode := &serial.Mode{
-		BaudRate: 115200, //115200 tag //230400 antenna
-	}
-	openPort, err := serial.Open(ports[0].Name, mode)
-	if err != nil {
-		//log.Fatal(err)
-	}
-	buff := make([]byte, 1024) //100 ?
+	// mode := &serial.Mode{
+	// 	BaudRate: 115200, //115200 tag //230400 antenna
+	// }
+	// openPort, err := serial.Open(ports[0].Name, mode)
+	// if err != nil {
+	// 	//log.Fatal(err)
+	// }
+	// buff := make([]byte, 1024) //100 ?
 
 	for {
 		var messageToAPI = "ERROR"
-		n, err := openPort.Read(buff)
-		if err != nil {
-			messageToAPI = "ERROR READING"
-		} else if n == 0 {
-			messageToAPI = "ERROR 0 BYTES READ"
-		} else {
-			messageToAPI = string(buff[:n])
-		}
+		//n, err := openPort.Read(buff)
+		// if err != nil {
+		// 	messageToAPI = "ERROR READING"
+		// } else if n == 0 {
+		// 	messageToAPI = "ERROR 0 BYTES READ"
+		// } else {
+		// 	messageToAPI = string(buff[:n])
+		// }
 
 		// AoA decode
 		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
