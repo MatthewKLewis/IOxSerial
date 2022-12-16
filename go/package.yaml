@@ -22,12 +22,12 @@ app:
 
   resources:
     profile: c1.small
-    devices:
-    - type: serial
-      alias: usb
-      label: HOST_DEV
-      device-id: /dev/ttyUSB0
-      usage: Serial device of USB port of AP
+    # devices:
+    # - type: serial
+    #   alias: usb
+    #   label: HOST_DEV
+    #   device-id: /dev/ttyUSB0
+    #   usage: Serial device of USB port of AP
     network:
       -   
         interface-name: eth0
