@@ -5,7 +5,7 @@
         "type": "serial",
         "alias": "usb",
         "label": "HOST_DEV",
-        "device-id": "/dev/ttyUSB2",
+        "device-id": "/dev/ttyUSB3",
         "usage": "Serial device of USB port of AP"
       }
     ]
