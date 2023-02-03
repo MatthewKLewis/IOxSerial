@@ -51,9 +51,9 @@ func readSerialDataAndPost() {
 
 		n, err := openPort.Read(buff)
 		if err != nil {
-			messageToAPI = "ERROR READING"
+			//messageToAPI = "ERROR READING"
 		} else if n == 0 {
-			messageToAPI = "ERROR 0 BYTES READ"
+			//messageToAPI = "ERROR 0 BYTES READ"
 		} else {
 			messageToAPI = string(buff[:n])
 		}
