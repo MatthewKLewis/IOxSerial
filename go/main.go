@@ -30,7 +30,7 @@ func readSerialDataAndPost() {
 	}
 
 	timeLastPostedLocation := time.Now()
-	locationPostingInterval := time.Second * 5
+	locationPostingInterval := time.Second * 10
 	var lat float64 = 38.443996 + (rand.Float64() / 100)
 	var lon float64 = -78.874740 + (rand.Float64() / 100)
 
