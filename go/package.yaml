@@ -28,12 +28,12 @@ app:
       label: HOST_DEV
       device-id: /dev/ttyUSB0
       usage: Serial device of USB port of AP
-    network:
-      -   
-        interface-name: eth0
-        ports:
-            tcp:
-            - 80
+    # network:
+    #   -   
+    #     interface-name: eth0
+    #     ports:
+    #         tcp:
+    #         - 80
 
 # Specify runtime and startup
 
