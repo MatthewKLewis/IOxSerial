@@ -25,8 +25,8 @@ app:
     devices:
     - type: serial
       alias: usb
-      label: HOST_DEV
-      device-id: /dev/ttyUSB3
+      # label: HOST_DEV
+      device-id: /dev/ttyUSB0
       usage: Serial device of USB port of AP
     network:
       -   
