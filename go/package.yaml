@@ -24,9 +24,9 @@ app:
     profile: c1.small
     devices:
     - type: serial
-      alias: usb
+      alias: usb-serial
       label: HOST_DEV
-      device-id: /dev/ttyUSB0
+      # device-id: /dev/ttyUSB0
       usage: Serial device of USB port of AP
     network:
       -   

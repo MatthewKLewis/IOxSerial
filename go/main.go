@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -20,7 +22,8 @@ var url_location = "http://52.45.17.177:80/XpertRestApi/api/location_data"
 
 func main() {
 	printStringInDebugMode("Starting Server...")
-	readSerialDataAndPost()
+	//readSerialDataAndPost()
+	readSerialDataAndFwd()
 }
 
 func readSerialDataAndPost() {
@@ -86,6 +89,71 @@ func readSerialDataAndPost() {
 			//_, err := io.ReadAll(resp.Body)
 			if err != nil {
 				log.Fatal(err)
+			}
+		}
+	}
+}
+
+func readSerialDataAndFwd() {
+	// //Get Port Information
+	// ports, err := enumerator.GetDetailedPortsList()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// if len(ports) == 0 {
+	// 	log.Fatal("No ports found.")
+	// }
+
+	//Set Configs
+	timeLastPostedLocation := time.Now()
+	locationPostingInterval := time.Second * 10
+	// mode := &serial.Mode{
+	// 	BaudRate: 230400, //115200 tag //230400 antenna
+	// }
+
+	// //Open a COM Port
+	// openPort, err := serial.Open(ports[0].Name, mode)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// buff := make([]byte, 1024) //100 ?
+
+	//Dial to TCP
+	servAddr := "localhost:6666"
+	tcpAddr, err := net.ResolveTCPAddr("tcp", servAddr)
+	if err != nil {
+		println("ResolveTCPAddr failed:", err.Error())
+		os.Exit(1)
+	}
+	conn, err := net.DialTCP("tcp", nil, tcpAddr)
+	if err != nil {
+		println("Dial failed:", err.Error())
+		os.Exit(1)
+	}
+
+	//Report COM data at a regular interval
+	for {
+		var messageToAPI = "ERROR"
+		// if len(ports) > 0 {
+		// 	messageToAPI = ports[0].Name
+		// }
+
+		//n, err := openPort.Read(buff)
+		// if err != nil {
+		// 	messageToAPI = "ERROR READING"
+		// } else if n == 0 {
+		// 	messageToAPI = "ERROR 0 BYTES READ"
+		// } else {
+		// 	messageToAPI = string(buff[:n])
+		// }
+
+		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
+			fmt.Println(messageToAPI)
+			timeLastPostedLocation = time.Now()
+			_, err = conn.Write([]byte(messageToAPI))
+			if err != nil {
+				println("Write to server failed:", err.Error())
+				os.Exit(1)
 			}
 		}
 	}
