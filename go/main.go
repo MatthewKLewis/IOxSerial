@@ -116,7 +116,7 @@ func readSerialDataAndFwd() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	buff := make([]byte, 1024) //100 ?
+	buff := make([]byte, 4096) //100 ?
 
 	//Dial to TCP
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", tcpAddr)
@@ -132,6 +132,7 @@ func readSerialDataAndFwd() {
 	//Report COM data as soon as read
 	for {
 		n, err := openPort.Read(buff)
+		fmt.Println(string(buff[:n]))
 		_, err = conn.Write(buff[:n])
 		if err != nil {
 			log.Fatal("Write to server failed:", err.Error())
