@@ -23,7 +23,8 @@ var tcpAddr = "52.45.17.177:24888"
 func main() {
 	printStringInDebugMode("Starting Server...")
 	//readSerialDataAndPost()
-	readSerialDataAndFwd()
+	//readSerialDataAndFwd()
+	simplestCaseFuction()
 }
 
 func readSerialDataAndPost() {
@@ -34,8 +35,8 @@ func readSerialDataAndPost() {
 
 	timeLastPostedLocation := time.Now()
 	locationPostingInterval := time.Second * 10
-	var lat float64 = 38.443996 + (rand.Float64() / 100)
-	var lon float64 = -78.874740 + (rand.Float64() / 100)
+	var lat float64 = 38.443986 + (rand.Float64() / 100)
+	var lon float64 = -78.874730 + (rand.Float64() / 100)
 
 	mode := &serial.Mode{
 		BaudRate: 921600, //115200 tag //230400 antenna //921600 3-6-2023 BLEAP
@@ -137,6 +138,38 @@ func readSerialDataAndFwd() {
 		if err != nil {
 			log.Fatal("Write to server failed:", err.Error())
 		}
+	}
+}
+
+func simplestCaseFuction() {
+
+	var lat float64 = 38.443995
+	var lon float64 = -78.874741
+
+	var jsonData = []byte(`{
+		"deviceimei": 111112222233333,
+		"altitude": 1,
+		"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
+		"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
+		"devicetime": 10,
+		"speed": 0,
+		"Batterylevel": "85",
+		"casefile_id": "string",
+		"address": "string",
+		"positioningmode": "string",
+		"tz": "string",
+		"alert_type": "string",
+		"alert_message": "Working given new deployment VM",
+		"alert_id": "string",
+		"offender_name": "string",
+		"offender_id": "string"
+	}`)
+
+	printStringInDebugMode("Sending Packet to API")
+	_, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
+	//_, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 
