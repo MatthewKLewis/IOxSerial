@@ -1,0 +1,42 @@
+descriptor-schema-version: "2.10"
+
+info:
+
+  name: ioxposter / portposter
+
+  description: "Simple Hello World Application"
+
+  version: "1.0"
+
+  author-link: "http://www.cisco.com"
+
+  author-name: "Cisco Systems"
+
+app:
+
+ # Refer Platform Support Matrix table.
+ # armv7l for 32 bit CPU Architecture.
+ # aarch64 for 64 bit CPU Architecture.
+  cpuarch: armv7l
+  type: docker # Indicate app type (docker)
+
+  resources:
+    profile: c1.small
+    devices:
+    - type: serial
+      alias: usb
+      label: HOST_DEV
+      device-id: /dev/ttyUSB0
+      usage: Serial device of USB port of AP
+    network:
+      -   
+        interface-name: eth0
+        ports:
+            tcp:
+            - 80
+
+# Specify runtime and startup
+
+  startup:
+    rootfs: rootfs.img
+    target: /usr/bin/main 1>/dev/null 2>/dev/null

@@ -143,9 +143,10 @@ func readSerialDataAndFwd() {
 
 func simplestCaseFuction() {
 
+	var timeLastPostedLocation = time.Now()
+	var locationPostingInterval = time.Second * 10
 	var lat float64 = 38.443995
 	var lon float64 = -78.874741
-
 	var jsonData = []byte(`{
 		"deviceimei": 111112222233333,
 		"altitude": 1,
@@ -159,17 +160,21 @@ func simplestCaseFuction() {
 		"positioningmode": "string",
 		"tz": "string",
 		"alert_type": "string",
-		"alert_message": "Working given new deployment VM",
+		"alert_message": "Working!!! given new deployment VM",
 		"alert_id": "string",
 		"offender_name": "string",
 		"offender_id": "string"
 	}`)
-
-	printStringInDebugMode("Sending Packet to API")
-	_, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
-	//_, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
+	
+	for {
+		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
+			timeLastPostedLocation = time.Now()
+			_, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
+			//_, err := io.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 	}
 }
 

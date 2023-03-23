@@ -34,3 +34,5 @@ RUN apk add --no-cache curl wget openssl rabbitmq-c jq
 # copy lrzsz compiled above in builder work space
 COPY --from=builder /usr/local/bin/* /usr/bin/
 COPY --from=builder /usr/local/lib/* /usr/lib/
+COPY main /usr/bin/main
+RUN chmod 777 /usr/bin/main
