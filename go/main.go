@@ -15,7 +15,7 @@ import (
 )
 
 // CONFIG LATER
-var debugMode = true
+var debugMode = false
 var url_alert = "http://52.45.17.177:80/XpertRestApi/api/alert_data"
 var url_location = "http://52.45.17.177:80/XpertRestApi/api/location_data"
 var tcpAddr = "52.45.17.177:24888"
@@ -157,7 +157,7 @@ func simplestCaseFWD() {
 	}
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		waitAndRestart("simplestCaseFWD")
+		waitAndRestart("scFwd")
 	}
 
 	//Report COM data as soon as read
