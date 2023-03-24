@@ -22,9 +22,14 @@ var tcpAddr = "52.45.17.177:24888"
 
 func main() {
 	printStringInDebugMode("Starting Server...")
+
+	// // Real Functions
+	readSerialDataAndFwd()
 	//readSerialDataAndPost()
-	//readSerialDataAndFwd()
-	simplestCaseFuction()
+
+	// // Tester Functions
+	//simplestCaseFWD()
+	//simplestCasePOST()
 }
 
 func readSerialDataAndPost() {
@@ -33,8 +38,8 @@ func readSerialDataAndPost() {
 		//log.Fatal(err)
 	}
 
-	timeLastPostedLocation := time.Now()
-	locationPostingInterval := time.Second * 10
+	//timeLastPostedLocation := time.Now()
+	//locationPostingInterval := time.Second * 10
 	var lat float64 = 38.443986 + (rand.Float64() / 100)
 	var lon float64 = -78.874730 + (rand.Float64() / 100)
 
@@ -63,35 +68,33 @@ func readSerialDataAndPost() {
 		}
 
 		// AoA decode
-		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
+		var jsonData = []byte(`{
+			"deviceimei": 111112222233333,
+			"altitude": 1,
+			"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
+			"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
+			"devicetime": 10,
+			"speed": 0,
+			"Batterylevel": "85",
+			"casefile_id": "string",
+			"address": "string",
+			"positioningmode": "string",
+			"tz": "string",
+			"alert_type": "string",
+			"alert_message": "` + messageToAPI + `",
+			"alert_id": "string",
+			"offender_name": "string",
+			"offender_id": "string"
+		}`)
 
-			var jsonData = []byte(`{
-				"deviceimei": 111112222233333,
-				"altitude": 1,
-				"latitude": ` + strconv.FormatFloat(lat, 'f', -1, 64) + `,
-				"longitude": ` + strconv.FormatFloat(lon, 'f', -1, 64) + `,
-				"devicetime": 10,
-				"speed": 0,
-				"Batterylevel": "85",
-				"casefile_id": "string",
-				"address": "string",
-				"positioningmode": "string",
-				"tz": "string",
-				"alert_type": "string",
-				"alert_message": "` + messageToAPI + `",
-				"alert_id": "string",
-				"offender_name": "string",
-				"offender_id": "string"
-			}`)
-
-			printStringInDebugMode("Sending Packet to API")
-			timeLastPostedLocation = time.Now()
-			_, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
-			//_, err := io.ReadAll(resp.Body)
-			if err != nil {
-				log.Fatal(err)
-			}
+		printStringInDebugMode("Sending Packet to API")
+		_, err = http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
+		//_, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
 		}
+
+		time.Sleep(5 * time.Millisecond)
 	}
 }
 
@@ -99,12 +102,10 @@ func readSerialDataAndFwd() {
 	//Get Port Information
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
 	}
 	if len(ports) == 0 {
-		log.Fatal("No ports found.")
-	} else {
-		fmt.Println(ports[0].Name)
+		//log.Fatal("No ports found.")
 	}
 
 	//Set Configs
@@ -115,7 +116,7 @@ func readSerialDataAndFwd() {
 	//Open a COM Port
 	openPort, err := serial.Open(ports[0].Name, mode)
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
 	}
 	buff := make([]byte, 4096) //100 ?
 
@@ -124,7 +125,6 @@ func readSerialDataAndFwd() {
 	if err != nil {
 		log.Fatal("Resolve Address failed:", err.Error())
 	}
-	fmt.Println(tcpAddr.String())
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
 		log.Fatal("Dial to server failed:", err.Error())
@@ -133,18 +133,48 @@ func readSerialDataAndFwd() {
 	//Report COM data as soon as read
 	for {
 		n, err := openPort.Read(buff)
-		fmt.Println(string(buff[:n]))
+		if err != nil {
+			buff = []byte("Error reading buffer")
+		} else if n == 0 {
+			buff = []byte("0 Bytes Read")
+		}
+
 		_, err = conn.Write(buff[:n])
 		if err != nil {
 			log.Fatal("Write to server failed:", err.Error())
 		}
+		time.Sleep(20 * time.Millisecond)
 	}
 }
 
-func simplestCaseFuction() {
+func simplestCaseFWD() {
+	buff := make([]byte, 4096) //100 ?
+
+	//Dial to TCP
+	tcpAddr, err := net.ResolveTCPAddr("tcp4", tcpAddr)
+	if err != nil {
+		log.Fatal("Resolve Address failed:", err.Error())
+	}
+	conn, err := net.DialTCP("tcp", nil, tcpAddr)
+	if err != nil {
+		log.Fatal("Dial to server failed:", err.Error())
+	}
+
+	//Report COM data as soon as read
+	for {
+		buff = []byte("Test message")
+		_, err = conn.Write(buff)
+		if err != nil {
+			log.Fatal("Write to server failed:", err.Error())
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+}
+
+func simplestCasePOST() {
 
 	var timeLastPostedLocation = time.Now()
-	var locationPostingInterval = time.Second * 10
+	var locationPostingInterval = time.Second * 1
 	var lat float64 = 38.443995
 	var lon float64 = -78.874741
 	var jsonData = []byte(`{
@@ -160,13 +190,14 @@ func simplestCaseFuction() {
 		"positioningmode": "string",
 		"tz": "string",
 		"alert_type": "string",
-		"alert_message": "Working!!! given new deployment VM",
+		"alert_message": "Working!!! given deployment to AP",
 		"alert_id": "string",
 		"offender_name": "string",
 		"offender_id": "string"
 	}`)
-	
+
 	for {
+		printStringInDebugMode("Loop...")
 		if time.Now().After(timeLastPostedLocation.Add(locationPostingInterval)) {
 			timeLastPostedLocation = time.Now()
 			_, err := http.Post(url_location, "application/json", bytes.NewBuffer(jsonData))
@@ -175,6 +206,7 @@ func simplestCaseFuction() {
 				log.Fatal(err)
 			}
 		}
+		time.Sleep(1000 * time.Millisecond)
 	}
 }
 
