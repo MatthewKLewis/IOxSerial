@@ -224,7 +224,7 @@ func printArrayInDebugMode(str []string) {
 
 func waitAndRestart(mode string) {
 	printStringInDebugMode("Connection Lost. Trying to reconnect in 1 min, then " + mode)
-	time.Sleep(1 * time.Minute)
+	time.Sleep(1 * time.Second)
 
 	if mode == "" {
 		mode = "rsdFwd"
