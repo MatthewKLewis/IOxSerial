@@ -102,10 +102,12 @@ func readSerialDataAndFwd() {
 	//Get Port Information
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
-		waitAndRestart("rsdFwd")
+		//waitAndRestart("rsdFwd")
+		log.Fatal()
 	}
 	if len(ports) == 0 {
-		waitAndRestart("rsdFwd")
+		//waitAndRestart("rsdFwd")
+		log.Fatal()
 	}
 
 	//Set Configs
@@ -116,7 +118,8 @@ func readSerialDataAndFwd() {
 	//Open a COM Port
 	openPort, err := serial.Open(ports[0].Name, mode)
 	if err != nil {
-		waitAndRestart("rsdFwd")
+		//waitAndRestart("rsdFwd")
+		log.Fatal()
 	}
 	buff := make([]byte, 4096) //100 ?
 
@@ -224,7 +227,7 @@ func printArrayInDebugMode(str []string) {
 
 func waitAndRestart(mode string) {
 	printStringInDebugMode("Connection Lost. Trying to reconnect in 1 min, then " + mode)
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	if mode == "" {
 		mode = "rsdFwd"
