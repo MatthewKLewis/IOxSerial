@@ -32,3 +32,14 @@ RUN apk add --no-cache curl wget openssl rabbitmq-c jq
 # copy lrzsz compiled above in builder work space
 COPY --from=builder /usr/local/bin/* /usr/bin/
 COPY --from=builder /usr/local/lib/* /usr/lib/
+
+
+# Supersitious Success on 3/23/2023
+1. Run carefully through the instructions provided by Shashank.
+2. update linux, upgrade linux.
+3. make sure to delete the weird <none> images on 'docker images'
+4. use docker buildx mybuilder with linux/arm/v7, make sure that the package.tar was updated.
+5. copy the package.tar down to the ./conf folder
+6. run ioxclient run from the ./conf folder.
+7. have a time.Sleep(5 * time.Milliseconds) in the For loop in the go code.
+8. No need to use '--no-cache' if the deploy was successful once.
