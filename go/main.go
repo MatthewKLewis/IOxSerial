@@ -15,7 +15,7 @@ import (
 )
 
 // CONFIG LATER
-var debugMode = false
+var debugMode = true
 var url_alert = "http://52.45.17.177:80/XpertRestApi/api/alert_data"
 var url_location = "http://52.45.17.177:80/XpertRestApi/api/location_data"
 var tcpAddr = "52.45.17.177:24888"
@@ -102,10 +102,10 @@ func readSerialDataAndFwd() {
 	//Get Port Information
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
-		//log.Fatal(err)
+		waitAndRestart("rsdFwd")
 	}
 	if len(ports) == 0 {
-		//log.Fatal("No ports found.")
+		waitAndRestart("rsdFwd")
 	}
 
 	//Set Configs
@@ -116,7 +116,7 @@ func readSerialDataAndFwd() {
 	//Open a COM Port
 	openPort, err := serial.Open(ports[0].Name, mode)
 	if err != nil {
-		//log.Fatal(err)
+		waitAndRestart("rsdFwd")
 	}
 	buff := make([]byte, 4096) //100 ?
 
@@ -127,7 +127,7 @@ func readSerialDataAndFwd() {
 	}
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		log.Fatal("Dial to server failed:", err.Error())
+		waitAndRestart("rsdFwd")
 	}
 
 	//Report COM data as soon as read
@@ -141,7 +141,7 @@ func readSerialDataAndFwd() {
 
 		_, err = conn.Write(buff[:n])
 		if err != nil {
-			log.Fatal("Write to server failed:", err.Error())
+			waitAndRestart("rsdFwd")
 		}
 		time.Sleep(20 * time.Millisecond)
 	}
@@ -157,22 +157,22 @@ func simplestCaseFWD() {
 	}
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		log.Fatal("Dial to server failed:", err.Error())
+		waitAndRestart("simplestCaseFWD")
 	}
 
 	//Report COM data as soon as read
+	printStringInDebugMode("Entering for-loop")
 	for {
 		buff = []byte("Test message")
 		_, err = conn.Write(buff)
 		if err != nil {
-			log.Fatal("Write to server failed:", err.Error())
+			waitAndRestart("scFwd")
 		}
 		time.Sleep(5 * time.Millisecond)
 	}
 }
 
 func simplestCasePOST() {
-
 	var timeLastPostedLocation = time.Now()
 	var locationPostingInterval = time.Second * 1
 	var lat float64 = 38.443995
@@ -220,4 +220,24 @@ func printArrayInDebugMode(str []string) {
 	if debugMode == true {
 		fmt.Println(str)
 	}
+}
+
+func waitAndRestart(mode string) {
+	printStringInDebugMode("Connection Lost. Trying to reconnect in 1 min, then " + mode)
+	time.Sleep(1 * time.Minute)
+
+	if mode == "" {
+		mode = "rsdFwd"
+	}
+	switch mode {
+	case "rsdFwd":
+		readSerialDataAndFwd()
+	case "rsdPost":
+		readSerialDataAndPost()
+	case "scFwd":
+		simplestCaseFWD()
+	case "scPost":
+		simplestCasePOST()
+	}
+	simplestCaseFWD()
 }
