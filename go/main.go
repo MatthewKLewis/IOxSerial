@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -102,12 +103,10 @@ func readSerialDataAndFwd() {
 	//Get Port Information
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
-		//waitAndRestart("rsdFwd")
-		log.Fatal()
+		os.Exit(1)
 	}
 	if len(ports) == 0 {
-		//waitAndRestart("rsdFwd")
-		log.Fatal()
+		os.Exit(1)
 	}
 
 	//Set Configs
@@ -115,11 +114,10 @@ func readSerialDataAndFwd() {
 		BaudRate: 921600, //115200 tag //230400 antenna //921600 3-6-2023 BLEAP
 	}
 
-	//Open a COM Port
+	//Open the first COM Port
 	openPort, err := serial.Open(ports[0].Name, mode)
 	if err != nil {
-		//waitAndRestart("rsdFwd")
-		log.Fatal()
+		os.Exit(1)
 	}
 	buff := make([]byte, 4096) //100 ?
 
@@ -137,9 +135,7 @@ func readSerialDataAndFwd() {
 	for {
 		n, err := openPort.Read(buff)
 		if err != nil {
-			buff = []byte("Error reading buffer")
-		} else if n == 0 {
-			buff = []byte("0 Bytes Read")
+			waitAndRestart("rsdFwd")
 		}
 
 		_, err = conn.Write(buff[:n])
@@ -223,6 +219,10 @@ func printArrayInDebugMode(str []string) {
 	if debugMode == true {
 		fmt.Println(str)
 	}
+}
+
+func getComPort() {
+
 }
 
 func waitAndRestart(mode string) {
