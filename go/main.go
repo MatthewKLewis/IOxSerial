@@ -114,17 +114,26 @@ func readSerialDataAndFwd() {
 		BaudRate: 921600, //115200 tag //230400 antenna //921600 3-6-2023 BLEAP
 	}
 
-	//Open the first COM Port
+	//Open the 1st? 2nd? 3rd? COM Port
 	openPort, err := serial.Open(ports[0].Name, mode)
 	if err != nil {
-		os.Exit(1)
+		printStringInDebugMode("trying next COM.")
+		openPort, err = serial.Open(ports[1].Name, mode)
+		if err != nil {
+			printStringInDebugMode("trying next COM..")
+			openPort, err = serial.Open(ports[2].Name, mode)
+			if err != nil {
+				printStringInDebugMode("trying next COM...")
+				os.Exit(1)
+			}
+		}
 	}
 	buff := make([]byte, 4096) //100 ?
 
 	//Dial to TCP
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", tcpAddr)
 	if err != nil {
-		log.Fatal("Resolve Address failed:", err.Error())
+		os.Exit(1)
 	}
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
