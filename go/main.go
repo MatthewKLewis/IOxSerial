@@ -8,19 +8,32 @@ import (
 
 	"go.bug.st/serial"
 	"go.bug.st/serial/enumerator"
+	"gopkg.in/ini.v1"
 )
 
 // CONFIG LATER
-var debugMode = true
+var debugLocal = true
+var debugForwarding = true
 
 // var url_alert = "http://52.45.17.177:80/XpertRestApi/api/alert_data"
 // var url_location = "http://52.45.17.177:80/XpertRestApi/api/location_data"
 
 // Add a listener on 170 or 177 that looks for debug messges.
 var tcpAddr = "52.45.17.177:24888" // add a new location for debug messages? Using 170 when it gets to Cisco.
-var tcpAddrDebug = "52.45.17.177:24889"
+var tcpAddrDebug = "52.45.17.177:25888"
 
 func main() {
+
+	cfg, err := ini.Load("package_config.ini")
+	if err != nil {
+		os.Exit(1)
+	}
+
+	//each config
+	tcpAddr = cfg.Section("upstream").Key("server_ip").String() + ":" + cfg.Section("upstream").Key("forward_port").String()
+	tcpAddrDebug = cfg.Section("upstream").Key("server_ip").String() + ":" + cfg.Section("upstream").Key("debug_port").String()
+	fmt.Println(tcpAddr, tcpAddrDebug)
+
 	readSerialDataAndFwd()
 }
 
@@ -30,35 +43,51 @@ func readSerialDataAndFwd() {
 		BaudRate: 921600, //115200 tag //230400 antenna //921600 3-6-2023 BLEAP
 	}
 
-	//Get Port Information
-	ports, err := enumerator.GetDetailedPortsList()
-	if err != nil {
-		os.Exit(1)
-	}
-	if len(ports) == 0 {
-		os.Exit(1)
-	}
-
 	//Dial to TCP for debugging
+	printStringInDebugMode("resolve debug")
 	tcpAddrDebug, err := net.ResolveTCPAddr("tcp4", tcpAddrDebug)
+	if err != nil {
+		printStringInDebugMode("couldn't resolve address for to debug server")
+		os.Exit(1)
+	}
+	printStringInDebugMode("connect debug")
 	connDebug, err := net.DialTCP("tcp", nil, tcpAddrDebug)
 	if err != nil {
-		debugMode = false
+		printStringInDebugMode("couldn't connect to debug server")
 	}
 
 	//Dial to TCP for forwarding
+	printStringInDebugMode("resolve aoa")
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", tcpAddr)
 	if err != nil {
 		writeDebugMessageToServer(connDebug, "couldn't resolve tcp address for forwading.")
 		os.Exit(1)
 	}
+	printStringInDebugMode("connect aoa")
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
 		writeDebugMessageToServer(connDebug, "couldn't connect to tcp address for forwading, restarting...")
 		waitAndRestart()
 	}
 
+	//Get Port Information
+	printStringInDebugMode("get port info")
+	ports, err := enumerator.GetDetailedPortsList()
+	if err != nil {
+		writeDebugMessageToServer(connDebug, "Couldn't get ports list")
+		os.Exit(1)
+	}
+	if len(ports) == 0 {
+		writeDebugMessageToServer(connDebug, "Ports list empty")
+		os.Exit(1)
+	}
+
+	for i := 0; i < len(ports); i++ {
+		writeDebugMessageToServer(connDebug, ports[i].Name)
+	}
+
 	//Open the 1st? 2nd? 3rd? COM Port
+	printStringInDebugMode("open port 0")
 	openPort, err := serial.Open(ports[0].Name, mode)
 	if err != nil {
 		writeDebugMessageToServer(connDebug, "couldn't open serial port at dev/ttyUSB0.")
@@ -66,6 +95,7 @@ func readSerialDataAndFwd() {
 	}
 
 	//Report COM data as soon as read
+	printStringInDebugMode("reading and writing!")
 	buff := make([]byte, 4096) //100 ?
 	for {
 		n, err := openPort.Read(buff)
@@ -84,19 +114,17 @@ func readSerialDataAndFwd() {
 }
 
 func printStringInDebugMode(str string) {
-	if !debugMode {
+	if !debugLocal {
 		return
 	}
-
 	fmt.Println(str)
 }
 
-func writeDebugMessageToServer(conn *net.TCPConn, msg string) {
-	if !debugMode {
+func writeDebugMessageToServer(c *net.TCPConn, msg string) {
+	if !debugForwarding {
 		return
 	}
-
-	_, err := conn.Write([]byte("ERROR: " + msg))
+	_, err := c.Write([]byte(" --- " + msg))
 	if err != nil {
 		os.Exit(1)
 	}
