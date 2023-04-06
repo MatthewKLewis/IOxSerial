@@ -36,7 +36,7 @@ COPY --from=builder /usr/local/bin/* /usr/bin/
 COPY --from=builder /usr/local/lib/* /usr/lib/
 
 COPY main /usr/bin/main
-COPY package_config.ini /usr/bin/main
+COPY package_config.ini /usr/bin/package_config.ini
 
 RUN chmod 777 /usr/bin/main
 RUN chmod 777 /usr/bin/package_config.ini
