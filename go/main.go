@@ -19,6 +19,7 @@ var mode = &serial.Mode{BaudRate: 921600} //115200 tag //230400 antenna //921600
 
 var connDebug *net.TCPConn = nil
 var connFwd *net.TCPConn = nil
+var openPort serial.Port = nil
 
 func main() {
 	//configs
@@ -38,7 +39,6 @@ func readSerialDataAndFwd() {
 	tcpAddrDebug, err := net.ResolveTCPAddr("tcp4", tcpAddrDebug)
 	if err != nil {
 		debug("couldn't resolve address for to debug server")
-		os.Exit(1)
 	}
 	debug("connect debug")
 	connDebug, err = net.DialTCP("tcp", nil, tcpAddrDebug)
@@ -48,11 +48,11 @@ func readSerialDataAndFwd() {
 	}
 
 	//Dial to TCP for data forwarding
-	debug("resolve aoa")
+	debug("resolve aoa tcp address")
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", tcpAddr)
 	if err != nil {
 		debug("couldn't resolve tcp address for forwading.")
-		os.Exit(1)
+		os.Exit(1) //KILL
 	}
 	debug("connect aoa")
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
@@ -62,15 +62,14 @@ func readSerialDataAndFwd() {
 	}
 
 	//Get Port Information
-	debug("get port info")
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		debug("Couldn't get ports list")
-		os.Exit(1)
+		os.Exit(1) //KILL
 	}
 	if len(ports) == 0 {
 		debug("Ports list empty")
-		os.Exit(1)
+		os.Exit(1) //KILL
 	}
 
 	for i := 0; i < len(ports); i++ {
@@ -78,11 +77,12 @@ func readSerialDataAndFwd() {
 	}
 
 	//Open the 1st? 2nd? 3rd? COM Port
-	debug("open port 0")
-	openPort, err := serial.Open(ports[0].Name, mode)
-	if err != nil {
-		debug("couldn't open serial port at dev/ttyUSB0.")
-		os.Exit(1)
+	if openPort == nil {
+		openPort, err = serial.Open(ports[0].Name, mode)
+		if err != nil {
+			debug("couldn't open serial port at dev/ttyUSB0.")
+			os.Exit(1) //KILL
+		}
 	}
 
 	//Report COM data as soon as read
@@ -113,7 +113,7 @@ func debug(msg string) {
 	if debug_fwd && connDebug != nil { //if debugging on our cloud server, print there.
 		_, err := connDebug.Write([]byte(" --- " + msg))
 		if err != nil {
-			os.Exit(1)
+			//os.Exit(1) //KILL?
 		}
 	}
 }
