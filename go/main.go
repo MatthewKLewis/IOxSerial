@@ -13,10 +13,13 @@ import (
 
 var debug_local = true
 var debug_fwd = true
-var tcpAddr = "52.45.17.177:24888" // add a new location for debug messages? Using 170 when it gets to Cisco.
-var tcpAddrDebug = "52.45.17.177:25888"
-var mode = &serial.Mode{BaudRate: 921600} //115200 tag //230400 antenna //921600 3-6-2023 BLEAP
 
+// 115200 tag // 230400 antenna // 921600 3-6-2023 BLEAP
+var mode = &serial.Mode{BaudRate: 921600}
+
+// add a new location for debug messages? Using 170 when it gets to Cisco.
+var tcpAddr string = ""
+var tcpAddrDebug = ""
 var connDebug *net.TCPConn = nil
 var connFwd *net.TCPConn = nil
 var openPort serial.Port = nil
@@ -25,11 +28,12 @@ func main() {
 	//configs
 	cfg, err := ini.Load("package_config.ini")
 	if err != nil {
-		os.Exit(1)
+		tcpAddr = "52.45.17.177:24888"
+		tcpAddrDebug = "52.45.17.177:25888"
+	} else {
+		tcpAddr = cfg.Section("upstream").Key("server_ip").String() + ":" + cfg.Section("upstream").Key("forward_port").String()
+		tcpAddrDebug = cfg.Section("upstream").Key("server_ip").String() + ":" + cfg.Section("upstream").Key("debug_port").String()
 	}
-	tcpAddr = cfg.Section("upstream").Key("server_ip").String() + ":" + cfg.Section("upstream").Key("forward_port").String()
-	tcpAddrDebug = cfg.Section("upstream").Key("server_ip").String() + ":" + cfg.Section("upstream").Key("debug_port").String()
-
 	readSerialDataAndFwd()
 }
 
