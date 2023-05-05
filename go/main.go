@@ -11,7 +11,7 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-var debug_local = true
+var debug_local = false
 var debug_fwd = true
 
 // 115200 tag // 230400 antenna // 921600 3-6-2023 BLEAP
