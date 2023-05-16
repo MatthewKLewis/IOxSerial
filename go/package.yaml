@@ -1,24 +1,19 @@
 descriptor-schema-version: "2.10"
 
 info:
-
-  name: ioxposter / portposter
-
-  description: "Simple Hello World Application"
-
+  name: "portposter"
+  description: "forwards COM port data to 177"
   version: "1.0"
-
-  author-link: "http://www.cisco.com"
-
-  author-name: "Cisco Systems"
+  author-link: "http://www.airistaflow.com"
+  author-name: "Airista"
 
 app:
 
  # Refer Platform Support Matrix table.
  # armv7l for 32 bit CPU Architecture.
  # aarch64 for 64 bit CPU Architecture.
-  cpuarch: armv7l
-  type: docker # Indicate app type (docker)
+  cpuarch: aarch64
+  type: docker
 
   resources:
     profile: c1.small
@@ -29,14 +24,11 @@ app:
       device-id: /dev/ttyUSB0
       usage: Serial device of USB port of AP
     network:
-      -   
+      -
         interface-name: eth0
-        ports:
-            tcp:
-            - 80
 
-# Specify runtime and startup
 
+  # Specify runtime and startup
   startup:
     rootfs: rootfs.img
     target: /usr/bin/main 1>/dev/null 2>/dev/null

@@ -1,1 +1,0 @@
-echo "Adding..." && ioxclient docker package -p ext2 ioxposter ./conf && cd conf && ioxclient application run portposter package.tar --payload activation.json && cd .. && echo "Listing Active..." && ioxclient application list
