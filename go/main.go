@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net"
 	"os"
 	"time"
@@ -11,8 +10,9 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-var debug_local = false
 var debug_fwd = true
+
+//dump error logs in /data/logs MKL 5-23-2023
 
 // 115200 tag // 230400 antenna // 921600 3-6-2023 BLEAP
 var mode = &serial.Mode{BaudRate: 921600}
@@ -44,6 +44,7 @@ func readSerialDataAndFwd() {
 	if err != nil {
 		debug("couldn't resolve address for to debug server")
 	}
+
 	debug("connect debug")
 	connDebug, err = net.DialTCP("tcp", nil, tcpAddrDebug)
 	if err != nil {
@@ -69,11 +70,11 @@ func readSerialDataAndFwd() {
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		debug("Couldn't get ports list")
-		os.Exit(1) //KILL
+		waitAndRestart()
 	}
 	if len(ports) == 0 {
 		debug("Ports list empty")
-		os.Exit(1) //KILL
+		waitAndRestart()
 	}
 
 	for i := 0; i < len(ports); i++ {
@@ -85,7 +86,7 @@ func readSerialDataAndFwd() {
 		openPort, err = serial.Open(ports[0].Name, mode)
 		if err != nil {
 			debug("couldn't open serial port at dev/ttyUSB0.")
-			os.Exit(1) //KILL
+			waitAndRestart()
 		}
 	}
 
@@ -111,9 +112,6 @@ func readSerialDataAndFwd() {
 }
 
 func debug(msg string) {
-	if debug_local { //if debugging locally, print locally.
-		fmt.Println(msg)
-	}
 	if debug_fwd && connDebug != nil { //if debugging on our cloud server, print there.
 		_, err := connDebug.Write([]byte(" --- " + msg))
 		if err != nil {

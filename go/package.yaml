@@ -12,7 +12,7 @@ app:
  # Refer Platform Support Matrix table.
  # armv7l for 32 bit CPU Architecture.
  # aarch64 for 64 bit CPU Architecture.
-  cpuarch: aarch64
+  cpuarch: armv71
   type: docker
 
   resources:
@@ -21,7 +21,6 @@ app:
     - type: serial
       alias: usb
       label: HOST_DEV
-      device-id: /dev/ttyUSB0
       usage: Serial device of USB port of AP
     network:
       -
