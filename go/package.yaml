@@ -8,7 +8,6 @@ info:
   author-name: "Airista"
 
 app:
-
  # Refer Platform Support Matrix table.
  # armv7l for 32 bit CPU Architecture.
  # aarch64 for 64 bit CPU Architecture.

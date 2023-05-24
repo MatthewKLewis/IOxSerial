@@ -5,24 +5,18 @@ import (
 	"os"
 	"time"
 
-	"go.bug.st/serial"
-	"go.bug.st/serial/enumerator"
+	"github.com/tarm/serial"
 	"gopkg.in/ini.v1"
 )
 
 var debug_fwd = true
 
-//dump error logs in /data/logs MKL 5-23-2023
-
-// 115200 tag // 230400 antenna // 921600 3-6-2023 BLEAP
-var mode = &serial.Mode{BaudRate: 921600}
-
+// dump error logs in /data/logs MKL 5-23-2023
 // add a new location for debug messages? Using 170 when it gets to Cisco.
 var tcpAddr string = ""
 var tcpAddrDebug = ""
 var connDebug *net.TCPConn = nil
 var connFwd *net.TCPConn = nil
-var openPort serial.Port = nil
 
 func main() {
 	//configs
@@ -67,27 +61,14 @@ func readSerialDataAndFwd() {
 	}
 
 	//Get Port Information
-	ports, err := enumerator.GetDetailedPortsList()
+	hostDev := os.Getenv("HOST_DEV")
+	if hostDev == "" {
+		hostDev = "COM3"
+	}
+	serialConfig := &serial.Config{Name: hostDev, Baud: 921600}
+	openPort, err := serial.OpenPort(serialConfig)
 	if err != nil {
-		debug("Couldn't get ports list")
-		waitAndRestart()
-	}
-	if len(ports) == 0 {
-		debug("Ports list empty")
-		waitAndRestart()
-	}
-
-	for i := 0; i < len(ports); i++ {
-		debug(ports[i].Name)
-	}
-
-	//Open the 1st? 2nd? 3rd? COM Port
-	if openPort == nil {
-		openPort, err = serial.Open(ports[0].Name, mode)
-		if err != nil {
-			debug("couldn't open serial port at dev/ttyUSB0.")
-			waitAndRestart()
-		}
+		debug("couldn't connect to port")
 	}
 
 	//Report COM data as soon as read
